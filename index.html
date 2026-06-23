@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Galaga">
+    <title>Galaga Touch</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="game-panel" aria-label="Galaga game">
+        <canvas id="game" width="960" height="720" aria-label="Galaga play field"></canvas>
+        <div class="hud" aria-hidden="true">
+          <div>
+            <span>SCORE</span>
+            <strong id="score">000000</strong>
+          </div>
+          <div>
+            <span>WAVE</span>
+            <strong id="wave">1</strong>
+          </div>
+          <div>
+            <span>LIVES</span>
+            <strong id="lives" class="hearts">♥♥♥</strong>
+          </div>
+        </div>
+        <div id="overlay" class="overlay">
+          <h1>GALAGA</h1>
+          <p id="overlayText">Start를 터치하거나 Enter로 시작</p>
+          <button id="startButton" type="button">Start</button>
+        </div>
+      </section>
+      <nav class="touch-controls" aria-label="Touch controls">
+        <div class="dpad" aria-label="Move">
+          <button type="button" class="touch-button up" data-control="arrowup" aria-label="Move up">▲</button>
+          <button type="button" class="touch-button left" data-control="arrowleft" aria-label="Move left">◀</button>
+          <button type="button" class="touch-button right" data-control="arrowright" aria-label="Move right">▶</button>
+          <button type="button" class="touch-button down" data-control="arrowdown" aria-label="Move down">▼</button>
+        </div>
+        <div class="actions" aria-label="Actions">
+          <button type="button" class="touch-button pause" data-action="pause" aria-label="Pause">P</button>
+          <button type="button" class="touch-button fire" data-control=" " aria-label="Fire">FIRE</button>
+        </div>
+      </nav>
+      <aside class="side-panel">
+        <div class="status">
+          <span>BEST</span>
+          <strong id="best">000000</strong>
+        </div>
+        <div class="controls">
+          <span>Move</span>
+          <kbd>←</kbd><kbd>→</kbd><kbd>A</kbd><kbd>D</kbd>
+          <kbd>↑</kbd><kbd>↓</kbd><kbd>W</kbd><kbd>S</kbd>
+          <span>Fire</span>
+          <kbd>Space</kbd>
+          <span>Pause</span>
+          <kbd>P</kbd>
+        </div>
+      </aside>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
