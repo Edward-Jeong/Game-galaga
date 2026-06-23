@@ -1,4 +1,4 @@
-# Galaga Touch
+# Game-galaga
 
 An iPhone-friendly Galaga-style browser game.
 
