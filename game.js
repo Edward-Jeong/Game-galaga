@@ -8,11 +8,11 @@ const bestEl = document.getElementById("best");
 const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlayText");
 const startButton = document.getElementById("startButton");
+const pauseButton = document.getElementById("pauseButton");
 
 const W = canvas.width;
 const H = canvas.height;
 const keys = new Set();
-const touchKeys = new Set();
 let touchTarget = null;
 const stars = Array.from({ length: 130 }, () => ({
   x: Math.random() * W,
@@ -159,7 +159,8 @@ function spawnWave() {
 function setState(next) {
   state = next;
   overlay.classList.toggle("hidden", next === "playing");
-  if (next === "ready") overlayText.textContent = "Start를 터치하거나 Enter로 시작";
+  pauseButton.classList.toggle("hidden", next === "ready" || next === "over");
+  if (next === "ready") overlayText.textContent = "Start를 누른 뒤 손가락으로 드래그";
   if (next === "paused") overlayText.textContent = "일시정지";
   if (next === "over") overlayText.textContent = "Game Over";
 }
@@ -269,21 +270,17 @@ function rectHit(a, b, aw, ah, bw, bh) {
   return Math.abs(a.x - b.x) < (aw + bw) / 2 && Math.abs(a.y - b.y) < (ah + bh) / 2;
 }
 
-function pressed(key) {
-  return keys.has(key) || touchKeys.has(key);
-}
-
 function updatePlaying(dt, now) {
-  const moveX = (pressed("arrowright") || pressed("d") ? 1 : 0) - (pressed("arrowleft") || pressed("a") ? 1 : 0);
-  const moveY = (pressed("arrowdown") || pressed("s") ? 1 : 0) - (pressed("arrowup") || pressed("w") ? 1 : 0);
+  const moveX = (keys.has("arrowright") || keys.has("d") ? 1 : 0) - (keys.has("arrowleft") || keys.has("a") ? 1 : 0);
+  const moveY = (keys.has("arrowdown") || keys.has("s") ? 1 : 0) - (keys.has("arrowup") || keys.has("w") ? 1 : 0);
   if (touchTarget) {
-    player.x += (touchTarget.x - player.x) * Math.min(1, dt * 9);
-    player.y += (touchTarget.y - player.y) * Math.min(1, dt * 9);
+    player.x += (touchTarget.x - player.x) * Math.min(1, dt * 12);
+    player.y += (touchTarget.y - player.y) * Math.min(1, dt * 12);
   }
   player.x = clamp(player.x + moveX * 430 * dt, 34, W - 34);
   player.y = clamp(player.y + moveY * 360 * dt, H * 0.42, H - 38);
   player.invincible = Math.max(0, player.invincible - dt * 1000);
-  if (pressed(" ")) shoot(now);
+  shoot(now);
 
   for (const bullet of bullets) {
     bullet.x += (bullet.vx || 0) * dt;
@@ -467,40 +464,17 @@ window.addEventListener("keyup", (event) => {
 });
 
 startButton.addEventListener("click", startOrResume);
-
-document.querySelectorAll("[data-control]").forEach((button) => {
-  const control = button.dataset.control;
-  const press = (event) => {
-    event.preventDefault();
-    if (control === " " && state !== "playing") startOrResume();
-    touchKeys.add(control);
-    button.classList.add("active");
-    button.setPointerCapture?.(event.pointerId);
-  };
-  const release = (event) => {
-    event.preventDefault();
-    touchKeys.delete(control);
-    button.classList.remove("active");
-  };
-  button.addEventListener("pointerdown", press);
-  button.addEventListener("pointerup", release);
-  button.addEventListener("pointercancel", release);
-  button.addEventListener("lostpointercapture", () => {
-    touchKeys.delete(control);
-    button.classList.remove("active");
-  });
-});
-
-document.querySelector("[data-action='pause']").addEventListener("click", (event) => {
+pauseButton.addEventListener("click", (event) => {
   event.preventDefault();
   togglePause();
 });
 
 function canvasPoint(event) {
   const rect = canvas.getBoundingClientRect();
+  const fingerOffset = window.matchMedia("(pointer: coarse)").matches ? 78 : 0;
   return {
     x: ((event.clientX - rect.left) / rect.width) * W,
-    y: ((event.clientY - rect.top) / rect.height) * H
+    y: ((event.clientY - rect.top) / rect.height) * H - fingerOffset
   };
 }
 
@@ -508,10 +482,9 @@ canvas.addEventListener("pointerdown", (event) => {
   event.preventDefault();
   if (state !== "playing") {
     startOrResume();
-    return;
+    if (state !== "playing") return;
   }
   touchTarget = canvasPoint(event);
-  touchKeys.add(" ");
   canvas.setPointerCapture?.(event.pointerId);
 });
 
@@ -524,14 +497,12 @@ canvas.addEventListener("pointermove", (event) => {
 function endCanvasTouch(event) {
   event.preventDefault();
   touchTarget = null;
-  touchKeys.delete(" ");
 }
 
 canvas.addEventListener("pointerup", endCanvasTouch);
 canvas.addEventListener("pointercancel", endCanvasTouch);
 canvas.addEventListener("lostpointercapture", () => {
   touchTarget = null;
-  touchKeys.delete(" ");
 });
 
 bestEl.textContent = pad(best);

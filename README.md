@@ -2,6 +2,8 @@
 
 An iPhone-friendly Galaga-style browser game.
 
+On mobile, bullets fire automatically. Drag anywhere on the play field to move the ship.
+
 ## Run locally
 
 ```powershell
