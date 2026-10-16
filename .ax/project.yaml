@@ -1,0 +1,33 @@
+version: 1
+project_id: galaga
+name: Starline Defender
+github_repo: Edward-Jeong/Game-galaga
+default_branch: main
+context_files:
+  - README.md
+verification:
+  - name: game rules
+    argv: [godot, --headless, --path, ., --script, tests/test_game_rules.gd]
+    timeout_seconds: 300
+  - name: full game flow
+    argv: [godot, --headless, --path, ., --script, tests/test_game_flow.gd]
+    timeout_seconds: 300
+allowed_paths:
+  - ".ax/**"
+  - ".github/**"
+  - "scenes/**"
+  - "scripts/**"
+  - "tests/**"
+  - README.md
+  - project.godot
+  - export_presets.cfg
+blocked_paths:
+  - .env
+  - ".env.*"
+  - "tools/**"
+  - "build/**"
+  - "**/*.pem"
+  - "**/*.key"
+high_risk_paths:
+  - ".github/workflows/**"
+  - project.godot
